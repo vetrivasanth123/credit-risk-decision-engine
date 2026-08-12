@@ -237,6 +237,3 @@ See:
 
 `notebooks/credit_risk_final.ipynb`
 
-## Final Project Status
-
-Project 1 is complete and frozen. The official model, preprocessing, calibration, thresholds and evaluation results are not changed by the documentation update.
