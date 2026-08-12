@@ -45,7 +45,7 @@ deployed pipeline after obtaining the original dataset.
 3. Preprocessing
 4. Baseline modelling
 5. LightGBM modelling
-6. SHAP explainability
+6. Global SHAP explainability
 7. Probability calibration
 8. OOF validation
 9. Decision engine
@@ -129,11 +129,11 @@ indicating remaining overfitting.
 
 Future improvements include:
 
-- stronger regularization
-- hyperparameter comparison
-- cost-sensitive threshold optimization
-- SHAP-based local explanations
-- production drift monitoring
+stronger regularization
+hyperparameter comparison
+cost-sensitive threshold optimization
+customer-level/local SHAP explanations
+production drift monitoring
 
 ## Project Report
 
