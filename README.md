@@ -17,10 +17,26 @@ Build a system that converts customer information into:
 
 ## Dataset
 
+This project uses the **Home Credit Default Risk** dataset.
+
+The raw dataset is not included in this repository due to
+dataset size and repository management considerations.
+
+Dataset source:
+
+https://www.kaggle.com/c/home-credit-default-risk/data
+
+### Dataset used in this project
+
 - Training customers: 172,205
 - Held-out test customers: 43,052
-- Input features: 106 raw/engineered features
-- Model features: 226
+- Raw/engineered input features: 106
+- Model features after preprocessing: 226
+
+The repository contains the final notebook, model artifacts,
+preprocessing pipeline, calibration model, decision configuration,
+and project report required to understand and reproduce the
+deployed pipeline after obtaining the original dataset.
 
 ## Methodology
 
@@ -91,6 +107,10 @@ The project packages:
 - feature metadata
 - decision configuration
 - model metadata
+
+The packaged artifacts were verified through an end-to-end
+deployment pipeline and reproduced the original model predictions
+without numerical differences.  
 
 The deployment pipeline was tested using:
 
