@@ -2,8 +2,11 @@
 
 An end-to-end credit risk decision system built with LightGBM and post-hoc Isotonic probability calibration. The system converts raw customer financial attributes into calibrated Probability of Default (PD), operational lending decisions, risk segmentation bands, portfolio expected-loss (EL) estimates, SHAP explainability, and a stress-tested deployment pipeline.
 
+---
+
 ## Project Structure
 
+```text
 credit-risk-decision-engine/
 ├── artifacts/
 │   ├── calibration_model.pkl
@@ -19,6 +22,9 @@ credit-risk-decision-engine/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+```
+
+---
 
 ## Business Problem & Objectives
 
@@ -33,14 +39,14 @@ In commercial lending, raw classification probabilities dictate underwriting dec
 * Provide global model auditability using SHAP TreeExplainer.
 * Package and stress-test an end-to-end deployment pipeline.
 
-
+---
 
 ## Dataset Overview
 
 This project utilizes the [Kaggle Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk/data) benchmark dataset. The dataset is split 80/20 via stratified sampling to preserve class ratios.
 
 | Parameter | Value / Count |
-
+| :--- | :--- |
 | **Training Customers** | 172,205 |
 | **Held-Out Test Customers** | 43,052 |
 | **Original Input Columns** | 99 *(after removing 1 constant column)* |
@@ -50,6 +56,7 @@ This project utilizes the [Kaggle Home Credit Default Risk](https://www.kaggle.c
 | **Final Pruned Model Features** | 186 |
 | **Observed Test Base Rate** | 8.12% |
 
+---
 
 ## Feature Engineering
 
@@ -63,14 +70,14 @@ To evaluate household capacity, debt burden, and external score metrics, 7 high-
 * `EMPLOYMENT_AGE_RATIO`: Employment duration relative to applicant age.
 * `EXT_SOURCE_MEAN`: Consolidated mean across external credit score metrics (`EXT_SOURCE_1`, `2`, `3`, `4`).
 
-
+---
 
 ## Model Development & Experimental Progression
 
 Model development progressed across 5 structured experimental iterations targeting generalization gap reduction, class imbalance optimization, feature pruning, and probability calibration.
 
 | Experiment Stage | Train ROC-AUC | Test ROC-AUC | Test PR-AUC | Generalization Gap | Key Strategy / Outcome |
-
+| :--- | :---: | :---: | :---: | :---: | :--- |
 | **Baseline LightGBM** | 0.8571 | 0.7395 | 0.2264 | 0.1176 | Initial baseline; severe structural overfitting |
 | **Exp 1: Regularization** | 0.7946 | 0.7439 | 0.2314 | 0.0507 | Reduced generalization gap by 57% |
 | **Exp 2: Hyperparameter Tuning** | 0.8022 | 0.7445 | 0.2321 | 0.0578 | Tuned depth, max leaves, and subsampling |
@@ -82,45 +89,45 @@ Model development progressed across 5 structured experimental iterations targeti
 * **5-Fold Stratified OOF Mean ROC-AUC**: `0.7403 ± 0.0018`
 * **Train-Test Generalization Gap**: Reduced by **>55%** (from `0.1176` baseline down to `0.0516`).
 
-
+---
 
 ## Probability Calibration
 
 Because tree classifiers trained with weighted instances (`scale_pos_weight=3.0`) produce distorted probability estimations, post-hoc **Isotonic Regression** (`calibration_model.pkl`) was fitted on out-of-fold predictions.
 
 | Metric | Uncalibrated Model | Calibrated Model | Status / Impact |
-
+| :--- | :---: | :---: | :--- |
 | **Brier Score** | 0.0839 | **0.0688** | Improved probability accuracy (lower is better) |
 | **Average Test PD** | 18.82% | **8.12%** | Aligned with true portfolio base rate (8.12%) |
 | **Test ROC-AUC** | 0.7452 | **0.7452** | Preserved ranking performance |
 | **Test PR-AUC** | 0.2329 | **0.2270** | Preserved precision-recall curve shape |
 
-
+---
 
 ## Decision Engine & Operational Workflows
 
 Calibrated probabilities pass through a deterministic rule engine that assigns operational lending actions based on fixed risk boundaries.
 
 | Decision Action | Rule Threshold | Customer Share (%) | Applicant Count | Observed Default Rate |
-
+| :--- | :---: | :---: | :---: | :---: |
 | **APPROVE** | $\text{PD} < 0.10$ | 71.71% | 30,872 | ~4.5% |
 | **REVIEW** | $0.10 \le \text{PD} < 0.18$ | 17.22% | 7,414 | ~12.9% |
 | **REJECT** | $\text{PD} \ge 0.18$ | 11.07% | 4,766 | ~27.8% |
 
-
+---
 
 ## Risk Segmentation
 
 Applicants are grouped into 4 risk tiers to enable risk-based pricing, capital reserve provisioning, and credit limit structuring.
 
 | Risk Tier | PD Band | Customer Share (%) | Avg Calibrated PD | Observed Default Rate |
-
+| :--- | :---: | :---: | :---: | :---: |
 | **Low Risk (Tier 1)** | $\text{PD} < 0.05$ | 44.10% | 3.13% | 2.85% |
 | **Medium Risk (Tier 2)** | $0.05 \le \text{PD} < 0.10$ | 27.61% | 7.11% | 6.95% |
 | **High Risk (Tier 3)** | $0.10 \le \text{PD} < 0.18$ | 17.22% | 13.40% | 12.93% |
 | **Very High Risk (Tier 4)** | $\text{PD} \ge 0.18$ | 11.07% | 24.41% | 27.85% |
 
-
+---
 
 ## Expected Loss & Portfolio Impact
 
@@ -132,7 +139,7 @@ $$\text{Expected Loss (EL)} = \text{PD} \times \text{Exposure at Default (EAD)} 
 * **LGD Assumption**: Fixed at 45% ($0.45$).
 
 | Portfolio Financial Metric | Evaluated Value |
-
+| :--- | :--- |
 | **Evaluated Test Customers** | 43,052 |
 | **Total Evaluated Portfolio Exposure (EAD)** | $25,974,998,023.50 |
 | **Average Calibrated Portfolio PD** | 8.12% |
@@ -143,7 +150,7 @@ $$\text{Expected Loss (EL)} = \text{PD} \times \text{Exposure at Default (EAD)} 
 
 > **Key Risk Insight**: Applicants in High and Very High risk tiers constitute **28.29%** of applicants but generate **~56.0%** of total expected financial loss. Automated rejections and manual reviews targeted at these tiers prevent over half of potential portfolio losses.
 
-
+---
 
 ## Global Explainability (SHAP)
 
@@ -154,7 +161,7 @@ Global feature importance was computed using `shap.TreeExplainer` on a represent
 3. **`DAYS_BIRTH` & `DAYS_EMPLOYMENT`**: Younger applicants and shorter employment histories drive higher risk scores.
 4. **`CREDIT_GOODS_RATIO`**: Over-leveraged financing relative to underlying asset value increases default probability.
 
-
+---
 
 ## Deployment & Production Pipeline
 
@@ -168,14 +175,14 @@ The production pipeline is modularized and serialized in the `artifacts/` folder
 * **`model_metadata.pkl`**: Version control, performance metrics, and build lineage metadata.
 
 ### Data Flow Execution Sequence
-
+```text
 Raw 106 Inputs 
   └─► Preprocessor (226 Encoded Features)
         └─► Feature Selection (186 Pruned Features)
               └─► LightGBM Classifier (Raw PD)
                     └─► Isotonic Calibrator (Calibrated PD)
                           └─► Decision Engine (Lending Action & Risk Tier)
-
+```
 
 ### Stress Testing Validation
 The automated deployment suite verified **8/8 test scenarios (100% Pass Rate)**:
@@ -188,12 +195,12 @@ The automated deployment suite verified **8/8 test scenarios (100% Pass Rate)**:
 * Boundary Threshold Evaluation (PD at 0.05, 0.10, and 0.18)
 * Malformed Input Payload Rejection
 
-
+---
 
 ## Governance & Audit Summary
 
 | Audit Dimension | Evaluation Status | Score |
-
+| :--- | :---: | :---: |
 | **Performance & Overfitting Audit** | Complete | Passed |
 | **Cross-Validation Stability Audit** | Complete | Passed |
 | **Decision Monotonicity Audit** | Complete | Passed |
@@ -202,14 +209,14 @@ The automated deployment suite verified **8/8 test scenarios (100% Pass Rate)**:
 | **Stress Testing Suite Audit** | Complete | Passed |
 | **Overall Governance Score** | **100.0%** | **EXCELLENT** |
 
-
+---
 
 ## Project Artifacts & Documentation
 
 * **Full Execution Notebook**: [`notebooks/credit_risk_final.ipynb`](notebooks/credit_risk_final.ipynb)
 * **Comprehensive PDF Report**: [`reports/credit_risk_decision_engine_project_report.pdf`](reports/credit_risk_decision_engine_project_report.pdf)
 
-
+---
 
 ## Limitations & Future Roadmap
 
